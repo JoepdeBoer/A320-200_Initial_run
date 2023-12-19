@@ -1,0 +1,3 @@
+function [CO2, vararg] = IDF_optimiser(X)
+    % Initial guesses of discipline outputs
+    LD_guess = X(18)
