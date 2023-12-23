@@ -41,10 +41,8 @@ S2 = (chord_2+chord_3)/2 * (span/2 - constant.s0); % surface area outboard secti
 S = (S1 + S2) * 2; % full wing surface area
 W_fuel = x(20);
 W_wing = x(21);
-%ZFW = 3.1485e+04+x(21)+constant.payload_max;    % Zero-fuel weight [kg]
-ZFW = 60500;
-%MTOW = W_fuel + W_wing + constant.W_aw;         % Maximum take-off weight [kg]
-MTOW = 73500;
+ZFW = 3.1485e+04+x(21)+constant.payload_max;    % Zero-fuel weight [kg]
+MTOW = W_fuel + W_wing + constant.W_aw;         % Maximum take-off weight [kg]
 
 %% Write .init
 filename = [filename, '.INIT'];

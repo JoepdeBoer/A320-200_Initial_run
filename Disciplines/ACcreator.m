@@ -23,20 +23,16 @@ kt = X(5:10); % top surface coefficients
 kb = X(11:16); % bottom surface coefficients
 altitude = X(18); % flight altitude (m)
 
-
 %Depending on dicipline variables
 if aero_loads == 1
     nmax = 2.5;
     Mach = constant.M_mo;
-    %W = (X(20) + X(21) + W_aw) * 9.81; % WTO_max in Newton
-    W = 73500 * 9.81;
+    W = constant.W_TO_max_ref * 9.81; % WTO_max in Newton
     AC.Visc = 0; % inviscid anlysis for loads
 else
     nmax = 1;
-    Mach = 0.78;
-    %Mach = X(17);
-    %W = sqrt(((X(20) + X(21) + W_aw) * 9.81) * ((W_aw - X(21)) * 9.81));% Design Weight in Newton
-    W =  sqrt((73500*9.81) * (73500*9.81 - 17940*9.81));
+    Mach = X(17);
+    W = sqrt((constant.W_TO_max_ref * 9.81) * ((constant.W_TO_max_ref-constant.W_fuel_ref) * 9.81));% Design Weight in Newton
     AC.Visc = 1; % viscid analysis for aerodynamics
 end
 
@@ -58,8 +54,6 @@ mac1 = 2/3 * c1 * (1 + taper1 + taper1^2)/(1 + taper1); % mac inboard section
 mac2 = 2/3 * c2 * (1 + taper2 + taper2^2)/(1 + taper2); % mac outboard section
 mac = (mac1 * S1 + mac2 * S2)/(S1 + S2); % total wing mac
 
-
-
 %Building the data structure
 AC.Aero.M = Mach;  % flight Mach number for loads NOT FOR AERO!!
 %                x    y     z   chord(m)    twist angle (deg) 
@@ -71,7 +65,7 @@ AC.Wing.Airfoils    = [kt,kb;
                        kt,kb;
                        kt,kb];
 AC.Wing.inc  = 0;              % Wing incidence angle (degree)
-AC.Wing.eta = [0; 0.5 ; 1];           % Spanwise location of the airfoil sections
+AC.Wing.eta = [0; s0/b/2 ; 1];    % Spanwise location of the airfoil sections  TOD0 S0 as fraction of the span 
 AC.Aero.MaxIterIndex = 150;    %Maximum number of Iteration for the
                                %convergence of viscous calculatio TODO
                                %inviscid so is this required?
@@ -80,9 +74,12 @@ AC.Aero.MaxIterIndex = 150;    %Maximum number of Iteration for the
 AC.Aero.alt  = altitude;
 
 % Use for newer MATLAB version
-[T, a, ~, rho] = atmosisa(AC.Aero.alt);
-mu = 1.457 * 10^-6 * T^(3/2) / (T + 110.4); % Dynamic viscousity (Emperical)
-nu = mu/rho;                                % Kinematic viscousity 
+% [~,a, ~, rho, nu] = atmosisa(AC.Aero.alt); % standard atmosphere calcs
+
+% Use for old MATLAB version
+[T, a, ~, rho] = atmosisa(AC.Aero.alt);         % standard atmosphere calcs
+mu = 1.457 * 10^-6 * T^(3/2) / (T + 110.4);     % Dynamic viscousity (Emperical)
+nu = mu/rho;                                    % Kinematic viscousity
 
 AC.Aero.V     = AC.Aero.M * a;              % flight speed (m/s)
 AC.Aero.rho   = rho;                        % air density  (kg/m3)
