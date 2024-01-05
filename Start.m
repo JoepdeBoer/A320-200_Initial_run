@@ -49,7 +49,7 @@ couplings.W_fuel = Performance(x0.*ref, constant, ref)
 [L, M_c4, AC] = Loads(x0.*ref);
 couplings.W_wing = Structures()
 constant.W_aw = constant.W_TO_max_ref - couplings.W_wing - couplings.W_fuel;
-[c, cc] = Constraints(x0.*ref)
+[c, cc] = Constraints(x0)
 V_tank = TankVolume(x0.*ref, constant);
 
 %% Reference planform plot
